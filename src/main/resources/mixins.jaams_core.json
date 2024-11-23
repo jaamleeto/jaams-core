@@ -1,0 +1,30 @@
+{
+  "required": true,
+  "package": "net.jaams.jaamscore.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "mixins.jaams_core.refmap.json",
+  "mixins": [
+    "DisableToastMixin",
+    "AdvancementAccessorMixin",
+    "JaamsCoreModConfigsMixin",
+    "BaseEntityMixin",
+    "BaseLivingEntityMixin",
+    "BaseMobMixin",
+    "SkeletonMixin",
+    "PiglinMixin",
+    "PillagerMixin",
+    "SlotMixin",
+    "PlayerRendererMixin",
+    "LivingEntityRendererMixin",
+    "LivingEntityMixin",
+    "PlayerMixin",
+    "ThrownItemRendererMixin",
+    "ThrownTridentRendererMixin",
+    "LlamaSpitRendererMixin",
+    "ShulkerBulletRendererMixin",
+    "GeoEntityRendererMixin",
+    "GeoReplacedEntityRendererMixin"
+  ],
+  "client": [],
+  "minVersion": "0.8"
+}

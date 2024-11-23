@@ -1,0 +1,11 @@
+{
+  "message.item_cannot_be_swapped": "The item in hand cannot be swapped",
+  "message.item_cannot_be_set": "This item cannot be set as the back item",
+  "message.item_swapped": "Back item has been swapped",
+  "message.items_combined": "Back items merged with the item in hand",
+  "message.item_cannot_be_swapped_but_moved": "Back item cannot be swapped, but it was moved",
+  "item.jaams_core.core_player_spawn_egg": "Core Player Spawn Egg",
+  "message.item_set": "Back item has been set",
+  "entity.jaams_core.core_player": "Core Player",
+  "message.item_moved_to_hand": "Back item has been moved to the hand"
+}

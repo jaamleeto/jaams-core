@@ -1,0 +1,31 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="All Rights Reserved"
+
+[[mods]]
+modId="jaams_core"
+version="1.0.0"
+displayName="Jaam's Core"
+displayURL="https://linktr.ee/jaamleeto"
+logoFile="jaams_core_banner.png"
+authors="Jaamleeto"
+description="Jaam's Core is a mod focused on mechanics, with highly customizable configuration options."
+issueTrackerURL="https://linktr.ee/jaamleeto"
+
+# Start of user code block mod configuration
+# End of user code block mod configuration
+
+[[dependencies.jaams_core]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1]"
+    ordering="AFTER"
+    side="BOTH"
+
+
+# Start of user code block dependencies configuration
+[modproperties."jaams_core"]
+catalogueImageIcon="jaams_core_icon.png"
+catalogueBackground="jaams_core_background.png"
+configuredBackground="minecraft:textures/block/spruce_planks.png"
+# End of user code block dependencies configuration

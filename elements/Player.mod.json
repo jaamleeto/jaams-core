@@ -1,0 +1,9 @@
+{
+  "_fv": 66,
+  "_type": "mixin",
+  "definition": {
+    "mixins": [
+      "PlayerMixin"
+    ]
+  }
+}

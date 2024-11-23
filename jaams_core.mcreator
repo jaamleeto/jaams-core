@@ -1,0 +1,392 @@
+{
+  "mod_elements": [
+    {
+      "name": "DisableToast",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "disable_toast",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamsadvancements/mixins/DisableToastMixin.java"
+        ]
+      },
+      "path": "~/Mixins/Advancement Mixins"
+    },
+    {
+      "name": "AdvancementAccessor",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "advancement_accessor",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamsadvancements/mixins/AdvancementAccessorMixin.java"
+        ]
+      },
+      "path": "~/Mixins/Advancement Mixins"
+    },
+    {
+      "name": "JaamsCoreClient",
+      "type": "config",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "jaams_core_client",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/configuration/JaamsCoreClientConfiguration.java"
+        ]
+      },
+      "path": "~/Config"
+    },
+    {
+      "name": "JaamsCoreCommon",
+      "type": "config",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "jaams_core_common",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/configuration/JaamsCoreCommonConfiguration.java"
+        ]
+      },
+      "path": "~/Config"
+    },
+    {
+      "name": "JaamsCoreModConfigs",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "jaams_core_mod_configs",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/JaamsCoreModConfigsMixin.java"
+        ]
+      },
+      "path": "~/Mixins"
+    },
+    {
+      "name": "BaseEntity",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "base_entity",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/BaseEntityMixin.java"
+        ]
+      },
+      "path": "~/Mixins/Base Mixins"
+    },
+    {
+      "name": "BaseLivingEntity",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "base_living_entity",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/BaseLivingEntityMixin.java"
+        ]
+      },
+      "path": "~/Mixins/Base Mixins"
+    },
+    {
+      "name": "BaseMob",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "base_mob",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/BaseMobMixin.java"
+        ]
+      },
+      "path": "~/Mixins/Base Mixins"
+    },
+    {
+      "name": "Skeleton",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "skeleton",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/SkeletonMixin.java"
+        ]
+      },
+      "path": "~/Mixins/Mob Mixins"
+    },
+    {
+      "name": "Piglin",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "piglin",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/PiglinMixin.java"
+        ]
+      },
+      "path": "~/Mixins/Mob Mixins"
+    },
+    {
+      "name": "Pillager",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "pillager",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/PillagerMixin.java"
+        ]
+      },
+      "path": "~/Mixins/Mob Mixins"
+    },
+    {
+      "name": "Slot",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "slot",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/SlotMixin.java"
+        ]
+      },
+      "path": "~/Mixins"
+    },
+    {
+      "name": "PlayerRenderer",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "player_renderer",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/PlayerRendererMixin.java"
+        ]
+      },
+      "path": "~/Mixins"
+    },
+    {
+      "name": "LivingEntityRenderer",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "living_entity_renderer",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/LivingEntityRendererMixin.java"
+        ]
+      },
+      "path": "~/Mixins"
+    },
+    {
+      "name": "LivingEntity",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "living_entity",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/LivingEntityMixin.java"
+        ]
+      },
+      "path": "~/Mixins"
+    },
+    {
+      "name": "Player",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "player",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/PlayerMixin.java"
+        ]
+      },
+      "path": "~/Mixins"
+    },
+    {
+      "name": "CorePlayer",
+      "type": "livingentity",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "core_player",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/jaams_core/models/item/core_player_spawn_egg.json",
+          "src/main/resources/data/jaams_core/forge/biome_modifier/core_player_biome_modifier.json",
+          "src/main/java/net/jaams/jaamscore/client/renderer/CorePlayerRenderer.java",
+          "src/main/java/net/jaams/jaamscore/entity/CorePlayerEntity.java"
+        ]
+      }
+    },
+    {
+      "name": "ThrownItemRenderer",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "thrown_item_renderer",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/ThrownItemRendererMixin.java"
+        ]
+      },
+      "path": "~/Mixins/Projectile Mixins"
+    },
+    {
+      "name": "ThrownTridentRenderer",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "thrown_trident_renderer",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/ThrownTridentRendererMixin.java"
+        ]
+      },
+      "path": "~/Mixins/Projectile Mixins"
+    },
+    {
+      "name": "LlamaSpitRenderer",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "llama_spit_renderer",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/LlamaSpitRendererMixin.java"
+        ]
+      },
+      "path": "~/Mixins/Projectile Mixins"
+    },
+    {
+      "name": "ShulkerBulletRenderer",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "shulker_bullet_renderer",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/ShulkerBulletRendererMixin.java"
+        ]
+      },
+      "path": "~/Mixins/Projectile Mixins"
+    },
+    {
+      "name": "GeoEntityRenderer",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "geo_entity_renderer",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/GeoEntityRendererMixin.java"
+        ]
+      },
+      "path": "~/Mixins"
+    },
+    {
+      "name": "GeoReplacedEntityRenderer",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "geo_replaced_entity_renderer",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/GeoReplacedEntityRendererMixin.java"
+        ]
+      },
+      "path": "~/Mixins"
+    }
+  ],
+  "variable_elements": [
+    {
+      "name": "UsesTotem",
+      "type": "logic",
+      "scope": "player_lifetime",
+      "value": "false"
+    },
+    {
+      "name": "MainWeapon",
+      "type": "itemstack",
+      "scope": "player_persistent",
+      "value": "ItemStack.EMPTY"
+    }
+  ],
+  "sound_elements": [],
+  "tag_elements": {},
+  "tab_element_order": {},
+  "language_map": {
+    "en_us": {
+      "message.item_cannot_be_swapped": "The item in hand cannot be swapped",
+      "message.item_cannot_be_set": "This item cannot be set as the back item",
+      "message.item_swapped": "Back item has been swapped",
+      "message.items_combined": "Back items merged with the item in hand",
+      "message.item_cannot_be_swapped_but_moved": "Back item cannot be swapped, but it was moved",
+      "item.jaams_core.core_player_spawn_egg": "Core Player Spawn Egg",
+      "message.item_set": "Back item has been set",
+      "entity.jaams_core.core_player": "Core Player",
+      "message.item_moved_to_hand": "Back item has been moved to the hand"
+    }
+  },
+  "foldersRoot": {
+    "name": "~",
+    "children": [
+      {
+        "name": "Config",
+        "children": []
+      },
+      {
+        "name": "Mixins",
+        "children": [
+          {
+            "name": "Base Mixins",
+            "children": []
+          },
+          {
+            "name": "Advancement Mixins",
+            "children": []
+          },
+          {
+            "name": "Mob Mixins",
+            "children": []
+          },
+          {
+            "name": "Projectile Mixins",
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "KeyBinds",
+        "children": []
+      }
+    ]
+  },
+  "workspaceSettings": {
+    "modid": "jaams_core",
+    "modName": "Jaam\u0027s Core",
+    "version": "1.0.0",
+    "author": "Jaamleeto",
+    "websiteURL": "https://mcreator.net",
+    "license": "All Rights Reserved",
+    "serverSideOnly": false,
+    "requiredMods": [],
+    "dependencies": [],
+    "dependants": [],
+    "mcreatorDependencies": [
+      "configured",
+      "damage_indicator",
+      "geckolib",
+      "catalogue",
+      "jei"
+    ],
+    "currentGenerator": "forge-1.20.1",
+    "credits": "Created using mod maker MCreator - https://mcreator.net/about",
+    "modElementsPackage": "net.jaams.jaamscore"
+  },
+  "mcreatorVersion": 202400232117
+}
