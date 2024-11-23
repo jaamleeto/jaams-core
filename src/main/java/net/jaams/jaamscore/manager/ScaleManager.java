@@ -4,8 +4,6 @@ package net.jaams.jaamscore.manager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.server.level.ServerLevel;
 
-import net.jaams.jaamscore.packets.ScaleSyncPacket;
-
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.UUID;
 import java.util.Map;
@@ -20,9 +18,6 @@ public class ScaleManager {
 			entityScales.put(entityUUID, scale);
 		}
 		Entity entity = serverLevel.getEntity(entityUUID);
-		if (entity != null) {
-			ScaleSyncPacket.sendToAllTracking(entity, scale);
-		}
 	}
 
 	public static void setScale(UUID entityUUID, float scale) {
@@ -44,9 +39,6 @@ public class ScaleManager {
 	public static void removeScale(ServerLevel serverLevel, UUID entityUUID) {
 		entityScales.remove(entityUUID);
 		Entity entity = serverLevel.getEntity(entityUUID);
-		if (entity != null) {
-			ScaleSyncPacket.sendToAllTracking(entity, 1.0f);
-		}
 	}
 
 	public static void removeScale(UUID entityUUID) {

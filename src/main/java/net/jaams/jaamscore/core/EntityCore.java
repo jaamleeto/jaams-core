@@ -46,7 +46,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.advancements.Advancement;
 
 import net.jaams.jaamscore.util.EntityConfigLoader;
-import net.jaams.jaamscore.packets.ScaleSyncPacket;
 import net.jaams.jaamscore.manager.ScaleManager;
 import net.jaams.jaamscore.manager.EntityEquipmentManager;
 import net.jaams.jaamscore.handler.EntityBehaviorsHandler;
@@ -117,7 +116,6 @@ public class EntityCore {
 			if (data.contains("entityScale")) {
 				float storedScale = data.getFloat("entityScale");
 				ScaleManager.setScale(entity.getUUID(), storedScale);
-				ScaleSyncPacket.sendToAllTracking(entity, storedScale);
 			}
 			try {
 				String entityType = EntityType.getKey(entity.getType()).toString();
