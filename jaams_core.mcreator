@@ -300,6 +300,19 @@
         ]
       },
       "path": "~/Mixins"
+    },
+    {
+      "name": "BackItemKeybind",
+      "type": "keybind",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "back_item_keybind",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/network/BackItemKeybindMessage.java"
+        ]
+      },
+      "path": "~/KeyBinds"
     }
   ],
   "variable_elements": [
@@ -329,6 +342,7 @@
       "item.jaams_core.core_player_spawn_egg": "Core Player Spawn Egg",
       "message.item_set": "Back item has been set",
       "entity.jaams_core.core_player": "Core Player",
+      "key.jaams_core.back_item_keybind": "Back Item Keybind",
       "message.item_moved_to_hand": "Back item has been moved to the hand"
     }
   },

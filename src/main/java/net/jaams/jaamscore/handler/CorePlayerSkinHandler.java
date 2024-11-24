@@ -38,10 +38,10 @@ import com.mojang.authlib.GameProfile;
 
 @OnlyIn(Dist.CLIENT)
 public class CorePlayerSkinHandler {
-	private static final Logger LOGGER = LogManager.getLogger();
-	private static final Map<String, CompletableFuture<ResourceLocation>> skinCache = new ConcurrentHashMap<>();
-	private static final String CONFIG_DIR = "config/jaams/core_textures/";
-	private final MinecraftSessionService sessionService = Minecraft.getInstance().getMinecraftSessionService();
+	public static final Logger LOGGER = LogManager.getLogger();
+	public static final Map<String, CompletableFuture<ResourceLocation>> skinCache = new ConcurrentHashMap<>();
+	public static final String CONFIG_DIR = "config/jaams/core_skins/";
+	public static final MinecraftSessionService sessionService = Minecraft.getInstance().getMinecraftSessionService();
 
 	public CorePlayerSkinHandler() {
 		java.nio.file.Path configPath = Paths.get(CONFIG_DIR);
@@ -54,8 +54,11 @@ public class CorePlayerSkinHandler {
 		}
 	}
 
-	public ResourceLocation getSkin(String nameTag, UUID uuid) {
-		java.nio.file.Path customSkinPath = Paths.get(CONFIG_DIR, nameTag + ".png");
+	public static ResourceLocation getSkin(String nameTag, UUID uuid) {
+		if (nameTag == null || nameTag.isEmpty()) {
+			return DefaultPlayerSkin.getDefaultSkin(uuid);
+		}
+		java.nio.file.Path customSkinPath = Paths.get(CONFIG_DIR, nameTag.toLowerCase() + ".png");
 		if (Files.exists(customSkinPath)) {
 			return loadCustomSkin(customSkinPath, nameTag);
 		}
@@ -63,7 +66,7 @@ public class CorePlayerSkinHandler {
 		return skinFuture.getNow(DefaultPlayerSkin.getDefaultSkin(uuid));
 	}
 
-	private ResourceLocation loadCustomSkin(java.nio.file.Path skinPath, String nameTag) {
+	public static ResourceLocation loadCustomSkin(java.nio.file.Path skinPath, String nameTag) {
 		try {
 			String formattedNameTag = nameTag.toLowerCase();
 			NativeImage image = NativeImage.read(Files.newInputStream(skinPath));
@@ -81,7 +84,7 @@ public class CorePlayerSkinHandler {
 	}
 
 	@Nullable
-	private static NativeImage processLegacySkin(NativeImage image) {
+	public static NativeImage processLegacySkin(NativeImage image) {
 		int height = image.getHeight();
 		int width = image.getWidth();
 		if (width == 64 && (height == 32 || height == 64)) {
@@ -147,34 +150,33 @@ public class CorePlayerSkinHandler {
 		}
 	}
 
-	private DynamicTexture createDynamicTextureFromNativeImage(NativeImage nativeImage) {
+	public DynamicTexture createDynamicTextureFromNativeImage(NativeImage nativeImage) {
 		return new DynamicTexture(nativeImage);
 	}
 
-	private ResourceLocation fetchOrDownloadSkin(String nameTag, UUID uuid) {
-		java.nio.file.Path skinPath = Paths.get(CONFIG_DIR, nameTag.toLowerCase() + ".png");
-		if (Files.exists(skinPath)) {
-			return loadCustomSkin(skinPath, uuid.toString());
-		}
-		MinecraftServer server = Minecraft.getInstance().getSingleplayerServer();
-		if (server != null) {
-			GameProfileCache profileCache = server.getProfileCache();
-			Optional<GameProfile> optionalProfile = profileCache.get(nameTag);
-			if (optionalProfile.isPresent()) {
-				GameProfile profile = optionalProfile.get();
-				sessionService.fillProfileProperties(profile, false);
-				Map<Type, MinecraftProfileTexture> textures = sessionService.getTextures(profile, false);
-				if (textures.containsKey(Type.SKIN)) {
-					MinecraftProfileTexture skinTexture = textures.get(Type.SKIN);
-					ResourceLocation skinLocation = Minecraft.getInstance().getSkinManager().registerTexture(skinTexture, Type.SKIN);
-					try (InputStream in = new URL(skinTexture.getUrl()).openStream()) {
-						Files.copy(in, skinPath, StandardCopyOption.REPLACE_EXISTING);
-					} catch (IOException e) {
-						LOGGER.error("Error downloading skin for {}: {}", nameTag, e.getMessage());
+	public static ResourceLocation fetchOrDownloadSkin(String nameTag, UUID uuid) {
+		try {
+			MinecraftServer server = Minecraft.getInstance().getSingleplayerServer();
+			if (server != null) {
+				GameProfileCache profileCache = server.getProfileCache();
+				Optional<GameProfile> optionalProfile = profileCache.get(nameTag);
+				if (optionalProfile.isPresent()) {
+					GameProfile profile = optionalProfile.get();
+					sessionService.fillProfileProperties(profile, false);
+					Map<Type, MinecraftProfileTexture> textures = sessionService.getTextures(profile, false);
+					if (textures.containsKey(Type.SKIN)) {
+						MinecraftProfileTexture skinTexture = textures.get(Type.SKIN);
+						ResourceLocation skinLocation = Minecraft.getInstance().getSkinManager().registerTexture(skinTexture, Type.SKIN);
+						java.nio.file.Path skinPath = Paths.get(CONFIG_DIR, nameTag.toLowerCase() + ".png");
+						try (InputStream in = new URL(skinTexture.getUrl()).openStream()) {
+							Files.copy(in, skinPath, StandardCopyOption.REPLACE_EXISTING);
+						}
+						return skinLocation;
 					}
-					return skinLocation;
 				}
 			}
+		} catch (Exception e) {
+			LOGGER.error("Error fetching skin for {}: {}", nameTag, e.getMessage());
 		}
 		return DefaultPlayerSkin.getDefaultSkin(uuid);
 	}

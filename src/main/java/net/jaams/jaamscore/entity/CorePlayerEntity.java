@@ -60,8 +60,10 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.chat.Component;
 import net.minecraft.nbt.CompoundTag;
 
+import net.jaams.jaamscore.packets.CorePlayerSkinPacket;
 import net.jaams.jaamscore.init.JaamsCoreModEntities;
 import net.jaams.jaamscore.configuration.JaamsCoreCommonConfiguration;
 
@@ -146,6 +148,29 @@ public class CorePlayerEntity extends Monster implements RangedAttackMob, Crossb
 	@Override
 	public void tick() {
 		super.tick();
+	}
+
+	@Override
+	public void setCustomName(Component customName) {
+		super.setCustomName(customName);
+		if (!this.level().isClientSide() && customName != null) {
+			this.updateSkin();
+		}
+	}
+
+	private String lastCustomName;
+
+	public void updateSkin() {
+		if (this.getCustomName() == null) {
+			return;
+		}
+		String nameTag = this.getCustomName().getString();
+		if (nameTag.equals(lastCustomName)) {
+			return;
+		}
+		lastCustomName = nameTag;
+		UUID entityUUID = this.getUUID();
+		CorePlayerSkinPacket.updateSkin(nameTag, entityUUID);
 	}
 
 	@Override

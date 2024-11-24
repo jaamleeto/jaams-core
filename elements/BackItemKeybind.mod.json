@@ -1,0 +1,9 @@
+{
+  "_fv": 66,
+  "_type": "keybind",
+  "definition": {
+    "triggerKey": "H",
+    "keyBindingName": "Back Item Keybind",
+    "keyBindingCategoryKey": "misc"
+  }
+}
