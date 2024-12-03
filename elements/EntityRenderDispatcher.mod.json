@@ -3,7 +3,7 @@
   "_type": "mixin",
   "definition": {
     "mixins": [
-      "LlamaSpitRendererMixin"
+      "EntityRenderDispatcherMixin"
     ]
   }
 }

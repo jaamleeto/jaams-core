@@ -34,7 +34,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Entity;
 
-import net.jaams.jaamscore.manager.ScaleManager;
+import net.jaams.jaamscore.init.JaamsCoreModAttributes;
 import net.jaams.jaamscore.entity.CorePlayerEntity;
 
 @Mixin(LivingEntity.class)
@@ -44,39 +44,40 @@ public abstract class LivingEntityMixin extends Entity {
 	}
 
 	@Inject(method = "createLivingAttributes", at = @At("RETURN"), cancellable = true)
-	private static void addAttackDamageToAttributes(CallbackInfoReturnable<AttributeSupplier.Builder> cir) {
+	private static void addAttributes(CallbackInfoReturnable<AttributeSupplier.Builder> cir) {
 		AttributeSupplier.Builder builder = cir.getReturnValue();
 		if (builder != null) {
 			builder.add(Attributes.ATTACK_DAMAGE);
+			builder.add(JaamsCoreModAttributes.CORESCALE.get(), 1.0);
 			cir.setReturnValue(builder);
 		}
 	}
 
-	@Inject(method = "defineSynchedData", at = @At("RETURN"))
-	private void onEntityInit(CallbackInfo ci) {
-		LivingEntity entity = (LivingEntity) (Object) this;
-		float scaleFactor = ScaleManager.getScale(entity.getUUID());
-		if (scaleFactor != 1.0F) {
-			entity.refreshDimensions();
-		}
-	}
+	private double lastCoreScale = 1.0;
 
 	@Inject(method = "tick", at = @At("HEAD"))
 	private void onTick(CallbackInfo ci) {
 		LivingEntity entity = (LivingEntity) (Object) this;
-		float scaleFactor = ScaleManager.getScale(entity.getUUID());
-		if (scaleFactor != 1.0F) {
+		double coreScale = 1.0;
+		if (entity.getAttributes() != null && entity.getAttributes().hasAttribute(JaamsCoreModAttributes.CORESCALE.get())) {
+			coreScale = entity.getAttributeValue(JaamsCoreModAttributes.CORESCALE.get());
+		}
+		if (coreScale != lastCoreScale) {
 			entity.refreshDimensions();
+			lastCoreScale = coreScale;
 		}
 	}
 
 	@Inject(method = "getDimensions", at = @At("RETURN"), cancellable = true)
 	public void modifyDimensions(Pose pose, CallbackInfoReturnable<EntityDimensions> cir) {
 		LivingEntity entity = (LivingEntity) (Object) this;
-		float scaleFactor = ScaleManager.getScale(entity.getUUID());
-		if (scaleFactor != 1.0F) {
+		double coreScale = 1.0;
+		if (entity.getAttributes() != null && entity.getAttributes().hasAttribute(JaamsCoreModAttributes.CORESCALE.get())) {
+			coreScale = entity.getAttributeValue(JaamsCoreModAttributes.CORESCALE.get());
+		}
+		if (coreScale != 1.0) {
 			EntityDimensions currentDimensions = cir.getReturnValue();
-			EntityDimensions newDimensions = new EntityDimensions(currentDimensions.width * scaleFactor, currentDimensions.height * scaleFactor, currentDimensions.fixed);
+			EntityDimensions newDimensions = new EntityDimensions((float) (currentDimensions.width * coreScale), (float) (currentDimensions.height * coreScale), currentDimensions.fixed);
 			this.setBoundingBox(newDimensions.makeBoundingBox(this.position()));
 			cir.setReturnValue(newDimensions);
 		}
@@ -85,13 +86,14 @@ public abstract class LivingEntityMixin extends Entity {
 	@Inject(method = "getEyeHeight(Lnet/minecraft/world/entity/Pose;Lnet/minecraft/world/entity/EntityDimensions;)F", at = @At("RETURN"), cancellable = true)
 	private void modifyEyeHeight(Pose pose, EntityDimensions dimensions, CallbackInfoReturnable<Float> cir) {
 		LivingEntity entity = (LivingEntity) (Object) this;
-		float scaleFactor = ScaleManager.getScale(entity.getUUID());
-		if (scaleFactor != 1.0F) {
-			if (entity instanceof AbstractPiglin || entity instanceof AbstractSkeleton || entity instanceof AbstractVillager || entity instanceof CaveSpider || entity instanceof Cow || entity instanceof Dolphin || entity instanceof EnderMan
-					|| entity instanceof Endermite || entity instanceof Fox || entity instanceof Ghast || entity instanceof Shulker || entity instanceof Silverfish || entity instanceof SnowGolem || entity instanceof Spider || entity instanceof Witch
-					|| entity instanceof WitherSkeleton || entity instanceof Zombie || entity instanceof ZombifiedPiglin || entity instanceof Player || entity instanceof CorePlayerEntity) {
-				cir.setReturnValue(cir.getReturnValue() * scaleFactor);
-			}
+		double coreScale = 1.0;
+		if (entity.getAttributes() != null && entity.getAttributes().hasAttribute(JaamsCoreModAttributes.CORESCALE.get())) {
+			coreScale = entity.getAttributeValue(JaamsCoreModAttributes.CORESCALE.get());
+		}
+		if (coreScale != 1.0 && (entity instanceof AbstractPiglin || entity instanceof AbstractSkeleton || entity instanceof AbstractVillager || entity instanceof CaveSpider || entity instanceof Cow || entity instanceof Dolphin
+				|| entity instanceof EnderMan || entity instanceof Endermite || entity instanceof Fox || entity instanceof Ghast || entity instanceof Shulker || entity instanceof Silverfish || entity instanceof SnowGolem || entity instanceof Spider
+				|| entity instanceof Witch || entity instanceof WitherSkeleton || entity instanceof Zombie || entity instanceof ZombifiedPiglin || entity instanceof Player || entity instanceof CorePlayerEntity)) {
+			cir.setReturnValue(cir.getReturnValue() * (float) coreScale);
 		}
 	}
 }

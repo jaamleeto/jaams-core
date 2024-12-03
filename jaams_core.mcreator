@@ -224,58 +224,6 @@
       }
     },
     {
-      "name": "ThrownItemRenderer",
-      "type": "mixin",
-      "compiles": true,
-      "locked_code": true,
-      "registry_name": "thrown_item_renderer",
-      "metadata": {
-        "files": [
-          "src/main/java/net/jaams/jaamscore/mixins/ThrownItemRendererMixin.java"
-        ]
-      },
-      "path": "~/Mixins/Projectile Mixins"
-    },
-    {
-      "name": "ThrownTridentRenderer",
-      "type": "mixin",
-      "compiles": true,
-      "locked_code": true,
-      "registry_name": "thrown_trident_renderer",
-      "metadata": {
-        "files": [
-          "src/main/java/net/jaams/jaamscore/mixins/ThrownTridentRendererMixin.java"
-        ]
-      },
-      "path": "~/Mixins/Projectile Mixins"
-    },
-    {
-      "name": "LlamaSpitRenderer",
-      "type": "mixin",
-      "compiles": true,
-      "locked_code": true,
-      "registry_name": "llama_spit_renderer",
-      "metadata": {
-        "files": [
-          "src/main/java/net/jaams/jaamscore/mixins/LlamaSpitRendererMixin.java"
-        ]
-      },
-      "path": "~/Mixins/Projectile Mixins"
-    },
-    {
-      "name": "ShulkerBulletRenderer",
-      "type": "mixin",
-      "compiles": true,
-      "locked_code": true,
-      "registry_name": "shulker_bullet_renderer",
-      "metadata": {
-        "files": [
-          "src/main/java/net/jaams/jaamscore/mixins/ShulkerBulletRendererMixin.java"
-        ]
-      },
-      "path": "~/Mixins/Projectile Mixins"
-    },
-    {
       "name": "GeoEntityRenderer",
       "type": "mixin",
       "compiles": true,
@@ -313,6 +261,28 @@
         ]
       },
       "path": "~/KeyBinds"
+    },
+    {
+      "name": "CoreScale",
+      "type": "attribute",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "core_scale",
+      "metadata": {
+        "files": []
+      }
+    },
+    {
+      "name": "EntityRenderDispatcher",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "entity_render_dispatcher",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/EntityRenderDispatcherMixin.java"
+        ]
+      }
     }
   ],
   "variable_elements": [
@@ -335,6 +305,7 @@
   "language_map": {
     "en_us": {
       "message.item_cannot_be_swapped": "The item in hand cannot be swapped",
+      "attribute.jaams_core.core_scale": "Core Scale",
       "message.item_cannot_be_set": "This item cannot be set as the back item",
       "message.item_swapped": "Back item has been swapped",
       "message.items_combined": "Back items merged with the item in hand",
@@ -366,10 +337,6 @@
           },
           {
             "name": "Mob Mixins",
-            "children": []
-          },
-          {
-            "name": "Projectile Mixins",
             "children": []
           }
         ]

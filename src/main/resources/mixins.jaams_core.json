@@ -18,12 +18,9 @@
     "LivingEntityRendererMixin",
     "LivingEntityMixin",
     "PlayerMixin",
-    "ThrownItemRendererMixin",
-    "ThrownTridentRendererMixin",
-    "LlamaSpitRendererMixin",
-    "ShulkerBulletRendererMixin",
     "GeoEntityRendererMixin",
-    "GeoReplacedEntityRendererMixin"
+    "GeoReplacedEntityRendererMixin",
+    "EntityRenderDispatcherMixin"
   ],
   "client": [],
   "minVersion": "0.8"

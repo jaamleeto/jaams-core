@@ -1,5 +1,6 @@
 {
   "message.item_cannot_be_swapped": "The item in hand cannot be swapped",
+  "attribute.jaams_core.core_scale": "Core Scale",
   "message.item_cannot_be_set": "This item cannot be set as the back item",
   "message.item_swapped": "Back item has been swapped",
   "message.items_combined": "Back items merged with the item in hand",

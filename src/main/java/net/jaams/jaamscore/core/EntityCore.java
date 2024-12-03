@@ -9,7 +9,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -26,6 +25,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.monster.Slime;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.animal.Sheep;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.EntityType;
@@ -46,11 +46,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.advancements.Advancement;
 
 import net.jaams.jaamscore.util.EntityConfigLoader;
-import net.jaams.jaamscore.manager.ScaleManager;
 import net.jaams.jaamscore.manager.EntityEquipmentManager;
+import net.jaams.jaamscore.init.JaamsCoreModAttributes;
 import net.jaams.jaamscore.handler.EntityBehaviorsHandler;
 import net.jaams.jaamscore.handler.BossBarHandler;
-import net.jaams.jaamscore.JaamsCoreMod;
 
 import java.util.Random;
 import java.util.Map;
@@ -80,16 +79,6 @@ public class EntityCore {
 	}
 
 	@SubscribeEvent
-	public static void onEntityDeath(LivingDeathEvent event) {
-		LivingEntity entity = event.getEntity();
-		if (ScaleManager.hasCustomScale(entity.getUUID())) {
-			JaamsCoreMod.queueServerWork(20, () -> {
-				ScaleManager.removeScale(entity.getUUID());
-			});
-		}
-	}
-
-	@SubscribeEvent
 	public static void onLivingDrops(LivingDropsEvent event) {
 		if (!(event.getEntity().level() instanceof ServerLevel serverLevel))
 			return;
@@ -115,7 +104,16 @@ public class EntityCore {
 			String lastConfigHashKey = "lastAppliedConfigHash";
 			if (data.contains("entityScale")) {
 				float storedScale = data.getFloat("entityScale");
-				ScaleManager.setScale(entity.getUUID(), storedScale);
+				if (entity.getAttributes() != null) {
+					AttributeInstance coreScaleAttribute = entity.getAttribute(JaamsCoreModAttributes.CORESCALE.get());
+					if (coreScaleAttribute != null) {
+						coreScaleAttribute.setBaseValue(storedScale);
+					} else {
+						LOGGER.warn("Atributo 'coreScale' no encontrado para la entidad: " + entity);
+					}
+				} else {
+					LOGGER.warn("Atributos no disponibles para la entidad: " + entity);
+				}
 			}
 			try {
 				String entityType = EntityType.getKey(entity.getType()).toString();
@@ -181,9 +179,9 @@ public class EntityCore {
 					}
 				}
 			} catch (JsonSyntaxException e) {
-				LOGGER.error("Syntax error in JSON configuration: " + e.getMessage());
+				LOGGER.error("Error de sintaxis en la configuración JSON: " + e.getMessage());
 			} catch (Exception e) {
-				LOGGER.error("Unexpected error while processing configuration: " + e.getMessage());
+				LOGGER.error("Error inesperado al procesar la configuración: " + e.getMessage());
 			}
 		}
 	}
@@ -724,9 +722,16 @@ public class EntityCore {
 				scaleOptions.add(scaleElement.getAsFloat());
 			}
 			float randomScale = scaleOptions.get((int) (Math.random() * scaleOptions.size()));
-			ScaleManager.setScale(entity.getUUID(), randomScale);
-			entity.getPersistentData().putFloat("entityScale", randomScale);
-			LOGGER.info("Scale of entity {} has been set to {}", entity.getName().getString(), randomScale);
+			if (entity instanceof LivingEntity) {
+				LivingEntity livingEntity = (LivingEntity) entity;
+				AttributeInstance coreScaleAttribute = livingEntity.getAttribute(JaamsCoreModAttributes.CORESCALE.get());
+				if (coreScaleAttribute != null) {
+					coreScaleAttribute.setBaseValue(randomScale);
+					LOGGER.info("Scale of entity {} has been set to {}", entity.getName().getString(), randomScale);
+				} else {
+					LOGGER.warn("Entity {} does not have the core_scale attribute.", entity.getName().getString());
+				}
+			}
 		}
 		// Apply color for sheep
 		if (finalConfig.has("sheep_color")) {

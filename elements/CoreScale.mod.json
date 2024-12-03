@@ -1,0 +1,12 @@
+{
+  "_fv": 66,
+  "_type": "attribute",
+  "definition": {
+    "description": "Core Scale",
+    "minValue": 0.0,
+    "maxValue": 1024.0,
+    "defaultValue": 1.0,
+    "isPersistent": true,
+    "entities": []
+  }
+}
