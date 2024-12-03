@@ -41,7 +41,7 @@ public class CorePlayerSkinPacket {
 	public void handle(Supplier<NetworkEvent.Context> context) {
 		context.get().enqueueWork(() -> {
 			if (context.get().getDirection().getReceptionSide().isClient()) {
-				CorePlayerSkinHandler.getSkin(nameTag, playerUUID);
+				CorePlayerSkinHandler.fetchOrDownloadSkin(nameTag, playerUUID);
 			}
 		});
 		context.get().setPacketHandled(true);
