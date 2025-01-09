@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 
@@ -19,7 +20,6 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.PanicGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.EntityType;
@@ -32,6 +32,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.registries.BuiltInRegistries;
 
 import java.util.List;
+import java.util.Arrays;
 import java.util.ArrayList;
 
 import com.google.gson.JsonObject;
@@ -190,43 +191,78 @@ public class EntityBehaviorsHandler {
 			}
 		}
 		if (entityBehaviors.has("attack_behavior")) {
-			JsonObject attackBehavior = entityBehaviors.getAsJsonObject("attack_behavior");
-			if (attackBehavior.get("enabled").getAsBoolean()) {
-				float attackDamage = attackBehavior.has("attack_damage") ? attackBehavior.get("attack_damage").getAsFloat() : 3.0F;
-				double speed = attackBehavior.has("speed") ? attackBehavior.get("speed").getAsDouble() : 1.0;
-				boolean revengeOnly = attackBehavior.has("attack_on_revenge") && attackBehavior.get("attack_on_revenge").getAsBoolean();
-				double attackRange = attackBehavior.has("attack_range") ? attackBehavior.get("attack_range").getAsDouble() : 16.0;
+			JsonObject behavior = entityBehaviors.getAsJsonObject("attack_behavior");
+			if (behavior.get("enabled").getAsBoolean()) {
+				// Comportamiento de ataque
+				float attackDamage = behavior.has("attack_damage") ? behavior.get("attack_damage").getAsFloat() : 3.0F;
+				double speed = behavior.has("speed") ? behavior.get("speed").getAsDouble() : 1.0;
+				boolean revengeOnly = behavior.has("attack_on_revenge") && behavior.get("attack_on_revenge").getAsBoolean();
+				double attackRange = behavior.has("attack_range") ? behavior.get("attack_range").getAsDouble() : 16.0;
+				List<String> targets = new ArrayList<>();
+				if (behavior.has("targets")) {
+					JsonArray targetsArray = behavior.getAsJsonArray("targets");
+					for (JsonElement targetElement : targetsArray) {
+						targets.add(targetElement.getAsString());
+					}
+				}
 				data.putBoolean("hasAttackBehavior", true);
 				data.putFloat("attackDamage", attackDamage);
 				data.putDouble("attackSpeed", speed);
 				data.putBoolean("revengeOnly", revengeOnly);
 				data.putDouble("attackRange", attackRange);
+				data.putString("attackTargets", String.join(",", targets));
 				if (entity instanceof PathfinderMob mob) {
-					if (mob.getAttributes().hasAttribute(Attributes.ATTACK_DAMAGE)) {
+					if (mob.goalSelector.getAvailableGoals().stream().noneMatch(goal -> goal.getGoal() instanceof MeleeAttackGoal)) {
 						mob.goalSelector.addGoal(2, new MeleeAttackGoal(mob, speed, true));
-						if (attackBehavior.has("targets")) {
-							JsonArray targets = attackBehavior.getAsJsonArray("targets");
-							setTargetGoals(mob, targets, revengeOnly, attackRange);
-						}
-						LOGGER.info("Attack behavior applied to entity {} with damage {}, speed {}, revengeOnly {}, and attack range {}", entity.getUUID(), attackDamage, speed, revengeOnly, attackRange);
-					} else {
-						LOGGER.warn("Entity {} does not have the required attribute ATTACK_DAMAGE to apply attack goals", entity.getUUID());
 					}
+					setTargetGoals(mob, targets, revengeOnly, attackRange);
+					LOGGER.info("Attack behavior applied to entity {}: attack damage {}, speed {}, targets {}", entity.getUUID(), attackDamage, speed, String.join(",", targets));
+				} else {
+					LOGGER.warn("Entity {} is not a PathfinderMob, behavior may not work properly", entity.getUUID());
+				}
+			} else {
+				// Si está deshabilitado, hacer pacífica a la entidad
+				if (entity instanceof PathfinderMob mob) {
+					mob.targetSelector.getAvailableGoals().clear();
+					mob.goalSelector.getAvailableGoals().removeIf(goal -> goal.getGoal() instanceof MeleeAttackGoal);
+					LOGGER.info("Entity {} made peaceful due to disabled attack_behavior", entity.getUUID());
 				}
 			}
 		}
 	}
 
-	private static void setTargetGoals(PathfinderMob entity, JsonArray targets, boolean revengeOnly, double range) {
-		for (int i = 0; i < targets.size(); i++) {
-			String targetTypeName = targets.get(i).getAsString();
+	@SubscribeEvent
+	public static void onAttackBehaviorUpdate(LivingEvent.LivingTickEvent event) {
+		LivingEntity entity = event.getEntity();
+		CompoundTag data = entity.getPersistentData();
+		if (data.getBoolean("hasAttackBehavior") && entity instanceof PathfinderMob mob) {
+			String[] targets = data.getString("attackTargets").split(",");
+			LivingEntity target = mob.getTarget();
+			if (target == null || !Arrays.asList(targets).contains(target.getType().toString())) {
+				updateAttackTargets(mob, targets);
+			}
+		}
+	}
+
+	private static void setTargetGoals(PathfinderMob mob, List<String> targets, boolean revengeOnly, double range) {
+		for (String targetTypeName : targets) {
 			EntityType<?> targetType = EntityType.byString(targetTypeName).orElse(null);
 			if (targetType != null) {
 				if (revengeOnly) {
-					entity.targetSelector.addGoal(1, new HurtByTargetGoal(entity));
+					mob.targetSelector.addGoal(1, new HurtByTargetGoal(mob));
 				} else {
-					entity.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(entity, LivingEntity.class, 10, true, false, livingEntity -> livingEntity.getType().equals(targetType)));
+					mob.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(mob, LivingEntity.class, 10, true, false, livingEntity -> livingEntity.getType().equals(targetType)));
 				}
+			}
+		}
+	}
+
+	private static void updateAttackTargets(PathfinderMob mob, String[] targets) {
+		mob.targetSelector.getAvailableGoals().clear();
+		for (String targetTypeName : targets) {
+			EntityType<?> targetType = EntityType.byString(targetTypeName).orElse(null);
+			if (targetType != null) {
+				mob.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(mob, LivingEntity.class, 10, true, false, livingEntity -> livingEntity.getType().equals(targetType)));
 			} else {
 				LOGGER.warn("Target type {} not found or is not valid", targetTypeName);
 			}

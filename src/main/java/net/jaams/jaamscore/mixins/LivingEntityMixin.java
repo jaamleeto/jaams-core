@@ -35,7 +35,6 @@ import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Entity;
 
 import net.jaams.jaamscore.init.JaamsCoreModAttributes;
-import net.jaams.jaamscore.entity.CorePlayerEntity;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
@@ -92,7 +91,7 @@ public abstract class LivingEntityMixin extends Entity {
 		}
 		if (coreScale != 1.0 && (entity instanceof AbstractPiglin || entity instanceof AbstractSkeleton || entity instanceof AbstractVillager || entity instanceof CaveSpider || entity instanceof Cow || entity instanceof Dolphin
 				|| entity instanceof EnderMan || entity instanceof Endermite || entity instanceof Fox || entity instanceof Ghast || entity instanceof Shulker || entity instanceof Silverfish || entity instanceof SnowGolem || entity instanceof Spider
-				|| entity instanceof Witch || entity instanceof WitherSkeleton || entity instanceof Zombie || entity instanceof ZombifiedPiglin || entity instanceof Player || entity instanceof CorePlayerEntity)) {
+				|| entity instanceof Witch || entity instanceof WitherSkeleton || entity instanceof Zombie || entity instanceof ZombifiedPiglin || entity instanceof Player)) {
 			cir.setReturnValue(cir.getReturnValue() * (float) coreScale);
 		}
 	}

@@ -4,24 +4,27 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "mixins.jaams_core.refmap.json",
   "mixins": [
-    "DisableToastMixin",
-    "AdvancementAccessorMixin",
-    "JaamsCoreModConfigsMixin",
     "BaseEntityMixin",
     "BaseLivingEntityMixin",
     "BaseMobMixin",
     "SkeletonMixin",
     "PiglinMixin",
     "PillagerMixin",
-    "SlotMixin",
-    "PlayerRendererMixin",
-    "LivingEntityRendererMixin",
     "LivingEntityMixin",
     "PlayerMixin",
+    "ItemStackConfigMixin",
+    "ItemConfigMixin",
+    "InteractionMixin",
+    "ItemGroupMixin",
+    "RecipeDisablingMixin",
+    "ItemEntityMixin",
+    "VillagerTradeMixin"
+  ],
+  "client": [
+    "LivingEntityRendererMixin",
     "GeoEntityRendererMixin",
     "GeoReplacedEntityRendererMixin",
-    "EntityRenderDispatcherMixin"
+    "ItemRendererMixin"
   ],
-  "client": [],
   "minVersion": "0.8"
 }

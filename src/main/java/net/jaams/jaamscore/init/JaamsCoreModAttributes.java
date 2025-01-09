@@ -20,7 +20,7 @@ import net.jaams.jaamscore.JaamsCoreMod;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class JaamsCoreModAttributes {
 	public static final DeferredRegister<Attribute> ATTRIBUTES = DeferredRegister.create(ForgeRegistries.ATTRIBUTES, JaamsCoreMod.MODID);
-	public static final RegistryObject<Attribute> CORESCALE = ATTRIBUTES.register("core_scale", () -> (new RangedAttribute("attribute." + JaamsCoreMod.MODID + ".core_scale", 1, 0, 1024)).setSyncable(true));
+	public static final RegistryObject<Attribute> CORESCALE = ATTRIBUTES.register("core_scale", () -> (new RangedAttribute("attribute." + JaamsCoreMod.MODID + ".core_scale", 1, 0.1, 30)).setSyncable(true));
 
 	@SubscribeEvent
 	public static void register(FMLConstructModEvent event) {

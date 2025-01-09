@@ -76,13 +76,19 @@ public class EntityEquipmentManager {
 				List<JsonObject> itemConfigs = equipmentConfig.get(key);
 				itemConfigs.forEach(itemConfig -> {
 					try {
-						if (!shouldApplyItemConfig(entity, itemConfig))
+						if (!shouldApplyItemConfig(entity, itemConfig)) {
 							return;
+						}
+						if (!itemConfig.has("id") || !itemConfig.has("quantity") || !itemConfig.has("drop_chance")) {
+							LOGGER.warn("Missing required fields in equipment configuration: {}", itemConfig);
+							return;
+						}
 						String itemIdentifier = itemConfig.get("id").getAsString();
 						double dropChance = itemConfig.get("drop_chance").getAsDouble();
 						double chance = itemConfig.has("chance") ? itemConfig.get("chance").getAsDouble() : 1.0;
-						if (Math.random() > chance)
+						if (Math.random() > chance) {
 							return;
+						}
 						int quantity = itemConfig.get("quantity").getAsInt();
 						ItemStack equippedItem = createConfiguredItem(itemConfig, itemIdentifier, quantity, slot == EquipmentSlot.HEAD);
 						if (!equippedItem.isEmpty()) {
@@ -91,7 +97,8 @@ public class EntityEquipmentManager {
 								mob.setDropChance(slot, (float) dropChance);
 							}
 						}
-					} catch (Exception ignored) {
+					} catch (Exception e) {
+						LOGGER.error("Error applying equipment configuration for entity {}: {}", entity, itemConfig, e);
 					}
 				});
 			}
@@ -100,22 +107,38 @@ public class EntityEquipmentManager {
 			List<JsonObject> lootConfigs = equipmentConfig.get("loot");
 			lootConfigs.forEach(lootConfig -> {
 				try {
-					if (!shouldApplyItemConfig(entity, lootConfig))
+					if (!shouldApplyItemConfig(entity, lootConfig)) {
 						return;
+					}
+					if (!lootConfig.has("id") || !lootConfig.has("quantity")) {
+						LOGGER.warn("Missing required fields in loot configuration: {}", lootConfig);
+						return;
+					}
 					String lootItemIdentifier = lootConfig.get("id").getAsString();
 					int quantity = lootConfig.get("quantity").getAsInt();
 					double chance = lootConfig.has("chance") ? lootConfig.get("chance").getAsDouble() : 1.0;
-					if (Math.random() > chance)
+					if (Math.random() > chance) {
 						return;
+					}
 					ItemStack lootItem = createConfiguredItem(lootConfig, lootItemIdentifier, quantity, false);
 					if (!lootItem.isEmpty()) {
 						CompoundTag lootTag = createLootTag(lootItem);
 						entity.getPersistentData().put("custom_loot", lootTag);
 					}
-				} catch (Exception ignored) {
+				} catch (Exception e) {
+					LOGGER.error("Error applying loot configuration for entity {}: {}", entity, lootConfig, e);
 				}
 			});
 		}
+	}
+
+	private static boolean isValidConfig(JsonObject config, String... requiredFields) {
+		for (String field : requiredFields) {
+			if (!config.has(field)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private static ItemStack createConfiguredItem(JsonObject itemConfig, String itemIdentifier, int quantity, boolean isPlayerHead) {
@@ -168,148 +191,107 @@ public class EntityEquipmentManager {
 
 	private static void applyItemConfig(ItemStack equippedItem, JsonObject itemConfig) {
 		if (itemConfig.has("color")) {
-			JsonElement colorElement = itemConfig.get("color");
 			List<Integer> colors = new ArrayList<>();
+			JsonElement colorElement = itemConfig.get("color");
 			if (colorElement.isJsonArray()) {
-				for (JsonElement color : colorElement.getAsJsonArray()) {
-					int colorValue = parseItemColor(color.getAsString());
-					colors.add(colorValue);
-				}
+				colorElement.getAsJsonArray().forEach(color -> colors.add(parseItemColor(color.getAsString())));
 			} else {
-				int colorValue = parseItemColor(colorElement.getAsString());
-				colors.add(colorValue);
+				colors.add(parseItemColor(colorElement.getAsString()));
 			}
 			int selectedColor = colors.get((int) (Math.random() * colors.size()));
 			applyDyeColor(equippedItem, selectedColor);
 		}
 		if (itemConfig.has("item_name")) {
-			JsonElement nameElement = itemConfig.get("item_name");
 			List<String> names = new ArrayList<>();
+			JsonElement nameElement = itemConfig.get("item_name");
 			if (nameElement.isJsonArray()) {
-				for (JsonElement name : nameElement.getAsJsonArray()) {
-					names.add(name.getAsString());
-				}
+				nameElement.getAsJsonArray().forEach(name -> names.add(name.getAsString()));
 			} else {
 				names.add(nameElement.getAsString());
 			}
 			String selectedName = names.get((int) (Math.random() * names.size()));
-			String formattedName = parseTextWithColorCodes(selectedName);
-			equippedItem.setHoverName(Component.literal(formattedName));
+			equippedItem.setHoverName(Component.literal(parseTextWithColorCodes(selectedName)));
 		}
 		if (itemConfig.has("lore")) {
 			JsonArray loreArray = itemConfig.getAsJsonArray("lore");
 			ListTag loreTag = new ListTag();
-			for (JsonElement loreElement : loreArray) {
+			loreArray.forEach(loreElement -> {
 				String formattedLore = parseTextWithColorCodes(loreElement.getAsString());
 				loreTag.add(StringTag.valueOf(Component.Serializer.toJson(Component.literal(formattedLore))));
-			}
+			});
 			equippedItem.getOrCreateTagElement("display").put("Lore", loreTag);
 		}
 		if (itemConfig.has("enchantments")) {
-			JsonArray enchantments = itemConfig.getAsJsonArray("enchantments");
-			for (JsonElement enchantmentElement : enchantments) {
+			itemConfig.getAsJsonArray("enchantments").forEach(enchantmentElement -> {
 				JsonObject enchantmentObject = enchantmentElement.getAsJsonObject();
 				String enchantmentId = enchantmentObject.get("id").getAsString();
 				int level = enchantmentObject.get("level").getAsInt();
-				double enchantmentProbability = enchantmentObject.has("probability") ? enchantmentObject.get("probability").getAsDouble() : 1.0;
-				if (Math.random() <= enchantmentProbability) {
+				double probability = enchantmentObject.has("probability") ? enchantmentObject.get("probability").getAsDouble() : 1.0;
+				if (Math.random() <= probability) {
 					Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(enchantmentId));
 					if (enchantment != null) {
 						equippedItem.enchant(enchantment, level);
 					}
 				}
-			}
+			});
 		}
 		if (itemConfig.has("attributes")) {
-			JsonArray attributesArray = itemConfig.getAsJsonArray("attributes");
-			for (JsonElement attributeElement : attributesArray) {
+			itemConfig.getAsJsonArray("attributes").forEach(attributeElement -> {
 				JsonObject attributeObject = attributeElement.getAsJsonObject();
 				String attributeId = attributeObject.get("id").getAsString();
 				String operation = attributeObject.get("operation").getAsString();
 				double amount = attributeObject.get("amount").getAsDouble();
-				JsonArray slotsArray = attributeObject.getAsJsonArray("slots");
 				Attribute attribute = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation(attributeId));
 				if (attribute != null) {
-					AttributeModifier.Operation attrOperation;
-					switch (operation.toLowerCase()) {
-						case "add" :
-							attrOperation = AttributeModifier.Operation.ADDITION;
-							break;
-						case "multiply_base" :
-							attrOperation = AttributeModifier.Operation.MULTIPLY_BASE;
-							break;
-						case "multiply_total" :
-							attrOperation = AttributeModifier.Operation.MULTIPLY_TOTAL;
-							break;
-						default :
-							continue;
-					}
-					System.out.println("Applying operation: " + attrOperation);
-					for (JsonElement slotElement : slotsArray) {
-						String slot = slotElement.getAsString();
-						EquipmentSlot equipmentSlot = EquipmentSlot.byName(slot);
-						equippedItem.addAttributeModifier(attribute, new AttributeModifier(UUID.randomUUID(), "Equipment modifier", amount, attrOperation), equipmentSlot);
+					AttributeModifier.Operation attrOperation = switch (operation.toLowerCase()) {
+						case "add" -> AttributeModifier.Operation.ADDITION;
+						case "multiply_base" -> AttributeModifier.Operation.MULTIPLY_BASE;
+						case "multiply_total" -> AttributeModifier.Operation.MULTIPLY_TOTAL;
+						default -> null;
+					};
+					if (attrOperation != null) {
+						UUID baseUUID = attributeObject.has("uuid") ? UUID.fromString(attributeObject.get("uuid").getAsString()) : UUID.randomUUID();
+						attributeObject.getAsJsonArray("slots").forEach(slotElement -> {
+							EquipmentSlot slot = EquipmentSlot.byName(slotElement.getAsString());
+							AttributeModifier modifier = new AttributeModifier(baseUUID, "Item modifier", amount, attrOperation);
+							equippedItem.addAttributeModifier(attribute, modifier, slot);
+						});
 					}
 				}
-			}
+			});
 		}
 		if (itemConfig.has("nbt")) {
 			JsonObject nbtObject = itemConfig.getAsJsonObject("nbt");
 			CompoundTag nbtTag = equippedItem.getOrCreateTag();
 			processNbtObject(nbtObject, nbtTag);
 			if (nbtObject.has("CustomModelData")) {
-				int customModelData = nbtObject.get("CustomModelData").getAsInt();
-				equippedItem.getOrCreateTag().putInt("CustomModelData", customModelData);
+				equippedItem.getOrCreateTag().putInt("CustomModelData", nbtObject.get("CustomModelData").getAsInt());
 			}
 			if (nbtObject.has("StoredEnchantments") && equippedItem.is(Items.ENCHANTED_BOOK)) {
-				JsonArray storedEnchantments = nbtObject.getAsJsonArray("StoredEnchantments");
 				ListTag enchantmentsTag = new ListTag();
-				for (JsonElement enchantmentElement : storedEnchantments) {
+				nbtObject.getAsJsonArray("StoredEnchantments").forEach(enchantmentElement -> {
 					JsonObject enchantmentObject = enchantmentElement.getAsJsonObject();
-					String id = enchantmentObject.get("id").getAsString();
-					int lvl = enchantmentObject.get("lvl").getAsInt();
 					CompoundTag enchantmentTag = new CompoundTag();
-					enchantmentTag.putString("id", id);
-					enchantmentTag.putShort("lvl", (short) lvl);
+					enchantmentTag.putString("id", enchantmentObject.get("id").getAsString());
+					enchantmentTag.putShort("lvl", (short) enchantmentObject.get("lvl").getAsInt());
 					enchantmentsTag.add(enchantmentTag);
-				}
-				equippedItem.getOrCreateTag().put("StoredEnchantments", enchantmentsTag);
+				});
+				nbtTag.put("StoredEnchantments", enchantmentsTag);
 			}
 			if (nbtObject.has("CustomPotionEffects") && equippedItem.is(Items.POTION)) {
-				JsonArray potionEffects = nbtObject.getAsJsonArray("CustomPotionEffects");
 				ListTag effectsTag = new ListTag();
-				for (JsonElement effectElement : potionEffects) {
+				nbtObject.getAsJsonArray("CustomPotionEffects").forEach(effectElement -> {
 					JsonObject effectObject = effectElement.getAsJsonObject();
-					int id = effectObject.get("Id").getAsInt();
-					int duration = effectObject.get("Duration").getAsInt();
-					int amplifier = effectObject.get("Amplifier").getAsInt();
 					CompoundTag effectTag = new CompoundTag();
-					effectTag.putInt("Id", id);
-					effectTag.putInt("Duration", duration);
-					effectTag.putInt("Amplifier", amplifier);
+					effectTag.putInt("Id", effectObject.get("Id").getAsInt());
+					effectTag.putInt("Duration", effectObject.get("Duration").getAsInt());
+					effectTag.putInt("Amplifier", effectObject.get("Amplifier").getAsInt());
 					effectsTag.add(effectTag);
-				}
-				equippedItem.getOrCreateTag().put("CustomPotionEffects", effectsTag);
+				});
+				nbtTag.put("CustomPotionEffects", effectsTag);
 			}
 			if (nbtObject.has("Potion") && equippedItem.is(Items.TIPPED_ARROW)) {
-				String potionType = nbtObject.get("Potion").getAsString();
-				equippedItem.getOrCreateTag().putString("Potion", potionType);
-				if (nbtObject.has("CustomPotionEffects")) {
-					JsonArray arrowEffects = nbtObject.getAsJsonArray("CustomPotionEffects");
-					ListTag effectsTag = new ListTag();
-					for (JsonElement effectElement : arrowEffects) {
-						JsonObject effectObject = effectElement.getAsJsonObject();
-						int id = effectObject.get("Id").getAsInt();
-						int duration = effectObject.get("Duration").getAsInt();
-						int amplifier = effectObject.get("Amplifier").getAsInt();
-						CompoundTag effectTag = new CompoundTag();
-						effectTag.putInt("Id", id);
-						effectTag.putInt("Duration", duration);
-						effectTag.putInt("Amplifier", amplifier);
-						effectsTag.add(effectTag);
-					}
-					equippedItem.getOrCreateTag().put("CustomPotionEffects", effectsTag);
-				}
+				nbtTag.putString("Potion", nbtObject.get("Potion").getAsString());
 			}
 		}
 	}

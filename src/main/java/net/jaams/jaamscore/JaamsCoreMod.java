@@ -17,9 +17,9 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.FriendlyByteBuf;
 
-import net.jaams.jaamscore.init.JaamsCoreModTabs;
-import net.jaams.jaamscore.init.JaamsCoreModItems;
-import net.jaams.jaamscore.init.JaamsCoreModEntities;
+import net.jaams.jaamscore.config.ItemTransformConfigLoader;
+import net.jaams.jaamscore.config.ItemConfigLoader;
+import net.jaams.jaamscore.config.EntityConfigLoader;
 
 import java.util.function.Supplier;
 import java.util.function.Function;
@@ -40,13 +40,10 @@ public class JaamsCoreMod {
 		// End of user code block mod constructor
 		MinecraftForge.EVENT_BUS.register(this);
 		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-
-		JaamsCoreModItems.REGISTRY.register(bus);
-		JaamsCoreModEntities.REGISTRY.register(bus);
-
-		JaamsCoreModTabs.REGISTRY.register(bus);
-
 		// Start of user code block mod init
+		EntityConfigLoader.init();
+		ItemTransformConfigLoader.init();
+		ItemConfigLoader.init();
 		// End of user code block mod init
 	}
 

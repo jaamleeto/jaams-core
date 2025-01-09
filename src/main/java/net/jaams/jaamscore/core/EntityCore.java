@@ -45,11 +45,11 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.advancements.Advancement;
 
-import net.jaams.jaamscore.util.EntityConfigLoader;
 import net.jaams.jaamscore.manager.EntityEquipmentManager;
 import net.jaams.jaamscore.init.JaamsCoreModAttributes;
 import net.jaams.jaamscore.handler.EntityBehaviorsHandler;
 import net.jaams.jaamscore.handler.BossBarHandler;
+import net.jaams.jaamscore.config.EntityConfigLoader;
 
 import java.util.Random;
 import java.util.Map;
@@ -109,22 +109,25 @@ public class EntityCore {
 					if (coreScaleAttribute != null) {
 						coreScaleAttribute.setBaseValue(storedScale);
 					} else {
-						LOGGER.warn("Atributo 'coreScale' no encontrado para la entidad: " + entity);
+						LOGGER.warn("Attribute 'core scale' not found for the entity: " + entity);
 					}
 				} else {
-					LOGGER.warn("Atributos no disponibles para la entidad: " + entity);
+					LOGGER.warn("Attributes not available for the entity: " + entity);
 				}
 			}
 			try {
 				String entityType = EntityType.getKey(entity.getType()).toString();
 				List<JsonObject> matchedConfigs = new ArrayList<>();
 				EntityConfigLoader.reloadConfigs();
+				// Iterar sobre las configuraciones cargadas
 				for (Map.Entry<String, List<JsonObject>> entry : EntityConfigLoader.getEntityConfigs().entrySet()) {
 					for (JsonObject config : entry.getValue()) {
+						// Verificar condiciones de entrada
 						JsonObject entryConditions = config.getAsJsonObject("entry_conditions");
 						if (!checkEntryConditions(entity, entryConditions)) {
 							continue;
 						}
+						// Obtener configuración de entrada y verificar probabilidad
 						JsonObject entrySettings = config.getAsJsonObject("entry_settings");
 						float chance = 1.0f;
 						if (entrySettings != null && entrySettings.has("chance")) {
@@ -133,11 +136,17 @@ public class EntityCore {
 						if (chance < 1.0f && Math.random() > chance) {
 							continue;
 						}
-						JsonArray entityArray = config.getAsJsonArray("entity");
+						// Validar que el campo target sea un array válido
+						if (!config.has("target") || !config.get("target").isJsonArray()) {
+							LOGGER.warn("The configuration does not contain a valid array in 'target'. Configuration ignored: " + config);
+							continue;
+						}
+						JsonArray targetArray = config.getAsJsonArray("target");
 						boolean matches = false;
-						for (JsonElement entityElement : entityArray) {
-							String entityConfig = entityElement.getAsString();
-							if (entityConfig.equals(entityType) || (entityConfig.startsWith("tag:") && checkEntityInTag(entity, entityConfig))) {
+						// Comprobar si el tipo de entidad coincide con el objetivo
+						for (JsonElement targetElement : targetArray) {
+							String targetConfig = targetElement.getAsString();
+							if (targetConfig.equals("target:all") || targetConfig.equals(entityType) || (targetConfig.startsWith("#") && checkEntityInTag(entity, targetConfig))) {
 								matches = true;
 								break;
 							}
@@ -147,32 +156,38 @@ public class EntityCore {
 						}
 					}
 				}
+				// Procesar configuraciones coincidentes
 				if (!matchedConfigs.isEmpty()) {
 					String lastConfigHash = data.getString(lastConfigHashKey);
 					matchedConfigs.removeIf(config -> calculateConfigHash(config).equals(lastConfigHash));
 					JsonObject finalConfig = selectConfigWithWeight(matchedConfigs);
 					if (finalConfig != null) {
 						JsonObject finalEntrySettings = finalConfig.getAsJsonObject("entry_settings");
-						JsonObject entitySettings = finalConfig.getAsJsonObject("entity_settings");
-						JsonObject entityBehaviors = finalConfig.getAsJsonObject("entity_behaviors");
-						boolean disableSpawn = entitySettings.has("disable_spawn") && entitySettings.get("disable_spawn").getAsBoolean();
+						JsonObject entitySettings = finalConfig.getAsJsonObject("target_settings");
+						JsonObject entityBehaviors = finalConfig.getAsJsonObject("target_behaviors");
+						// Comprobar si se debe deshabilitar el spawn
+						boolean disableSpawn = entitySettings != null && entitySettings.has("disable_spawn") && entitySettings.get("disable_spawn").getAsBoolean();
 						if (entity instanceof Player) {
-							disableSpawn = false;
+							disableSpawn = false; // No deshabilitar para jugadores
 						}
 						if (disableSpawn) {
 							event.setCanceled(true);
 							return;
 						}
+						// Verificar si se permite la remodificación
 						boolean allowReModification = finalEntrySettings == null || !finalEntrySettings.has("allow_re_modification") || finalEntrySettings.get("allow_re_modification").getAsBoolean();
 						if (data.getBoolean(processedKey) && !allowReModification) {
 							return;
 						}
+						// Aplicar configuraciones a la entidad
 						applyEntityConfigurations(entity, finalConfig);
 						data.putBoolean(processedKey, true);
 						data.putString(lastConfigHashKey, calculateConfigHash(finalConfig));
+						// Aplicar bossbar si está configurado
 						if (finalConfig.has("bossbar")) {
 							BossBarHandler.applyBossBar(entity, finalConfig);
 						}
+						// Aplicar comportamientos si están configurados
 						if (entityBehaviors != null) {
 							EntityBehaviorsHandler.applyEntityBehaviors(entity, entityBehaviors);
 						}
@@ -211,7 +226,7 @@ public class EntityCore {
 		if (entryConditions == null) {
 			return true;
 		}
-		String modId = entryConditions.has("modid") ? entryConditions.get("modid").getAsString() : null;
+		String modId = entryConditions.has("mod_id") ? entryConditions.get("mod_id").getAsString() : null;
 		if (modId != null && !net.minecraftforge.fml.ModList.get().isLoaded(modId)) {
 			return false;
 		}
@@ -662,8 +677,8 @@ public class EntityCore {
 			// Handle exception if necessary
 		}
 		// Apply special entity configuration
-		if (finalConfig.has("entity_settings") && !finalConfig.get("entity_settings").isJsonNull()) {
-			JsonObject entitySettings = finalConfig.getAsJsonObject("entity_settings");
+		if (finalConfig.has("target_settings") && !finalConfig.get("target_settings").isJsonNull()) {
+			JsonObject entitySettings = finalConfig.getAsJsonObject("target_settings");
 			applySpecialEntityConfig(entity, entitySettings);
 		} else {
 		}
@@ -674,19 +689,16 @@ public class EntityCore {
 		if (finalConfig.has("silent")) {
 			boolean silent = finalConfig.get("silent").getAsBoolean();
 			entity.setSilent(silent);
-			LOGGER.info("Entity {} has been set to silent: {}", entity.getName().getString(), silent);
 		}
 		// Apply invulnerable
 		if (finalConfig.has("invulnerable")) {
 			boolean invulnerable = finalConfig.get("invulnerable").getAsBoolean();
 			entity.setInvulnerable(invulnerable);
-			LOGGER.info("Entity {} has been set to invulnerable: {}", entity.getName().getString(), invulnerable);
 		}
 		// Apply glowing
 		if (finalConfig.has("glowing")) {
 			boolean glowing = finalConfig.get("glowing").getAsBoolean();
 			entity.setGlowingTag(glowing);
-			LOGGER.info("Entity {} has been set to glowing: {}", entity.getName().getString(), glowing);
 		}
 		// Apply nametag
 		if (finalConfig.has("name_tag")) {
@@ -699,7 +711,6 @@ public class EntityCore {
 			String formattedName = parseTextWithColorCodes(randomName); // Parse colors and formatting codes
 			entity.setCustomName(Component.literal(formattedName));
 			entity.setCustomNameVisible(true);
-			LOGGER.info("Entity {} has been given the name: {}", entity.getName().getString(), formattedName);
 		}
 		// Apply size for slimes
 		if (finalConfig.has("slime_size")) {
@@ -711,7 +722,6 @@ public class EntityCore {
 			float randomSize = sizeOptions.get((int) (Math.random() * sizeOptions.size()));
 			if (entity instanceof Slime slime) {
 				slime.setSize((int) randomSize, true);
-				LOGGER.info("Slime entity {} has been adjusted to size: {}", entity.getName().getString(), randomSize);
 			}
 		}
 		// Apply scale
@@ -722,12 +732,15 @@ public class EntityCore {
 				scaleOptions.add(scaleElement.getAsFloat());
 			}
 			float randomScale = scaleOptions.get((int) (Math.random() * scaleOptions.size()));
+			// Ensure the scale doesn't exceed the maximum value of 30
+			if (randomScale > 30.0f) {
+				randomScale = 30.0f;
+			}
 			if (entity instanceof LivingEntity) {
 				LivingEntity livingEntity = (LivingEntity) entity;
 				AttributeInstance coreScaleAttribute = livingEntity.getAttribute(JaamsCoreModAttributes.CORESCALE.get());
 				if (coreScaleAttribute != null) {
 					coreScaleAttribute.setBaseValue(randomScale);
-					LOGGER.info("Scale of entity {} has been set to {}", entity.getName().getString(), randomScale);
 				} else {
 					LOGGER.warn("Entity {} does not have the core_scale attribute.", entity.getName().getString());
 				}
@@ -743,7 +756,6 @@ public class EntityCore {
 			int randomColor = colorOptions.get((int) (Math.random() * colorOptions.size()));
 			if (entity instanceof Sheep sheep) {
 				sheep.setColor(DyeColor.byId(randomColor));
-				LOGGER.info("Sheep {} color has been set to: {}", entity.getName().getString(), DyeColor.byId(randomColor).getName());
 			}
 		}
 	}

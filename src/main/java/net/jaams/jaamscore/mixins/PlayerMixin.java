@@ -14,17 +14,6 @@ import net.jaams.jaamscore.init.JaamsCoreModAttributes;
 
 @Mixin(Player.class)
 public abstract class PlayerMixin {
-	/*
-		@Inject(method = "createAttributes", at = @At("RETURN"), cancellable = true)
-		private static void injectCoreScaleAttribute(CallbackInfoReturnable<AttributeSupplier.Builder> cir) {
-			AttributeSupplier.Builder builder = cir.getReturnValue();
-			if (builder != null) {
-				builder.add(JaamsCoreModAttributes.CORESCALE.get(), 1.0);
-				cir.setReturnValue(builder);
-			}
-		}
-	
-	*/
 	@Inject(method = "getDimensions", at = @At("RETURN"), cancellable = true)
 	public void modifyDimensions(Pose pose, CallbackInfoReturnable<EntityDimensions> cir) {
 		Player player = (Player) (Object) this;

@@ -1,71 +1,6 @@
 {
   "mod_elements": [
     {
-      "name": "DisableToast",
-      "type": "mixin",
-      "compiles": true,
-      "locked_code": true,
-      "registry_name": "disable_toast",
-      "metadata": {
-        "files": [
-          "src/main/java/net/jaams/jaamsadvancements/mixins/DisableToastMixin.java"
-        ]
-      },
-      "path": "~/Mixins/Advancement Mixins"
-    },
-    {
-      "name": "AdvancementAccessor",
-      "type": "mixin",
-      "compiles": true,
-      "locked_code": true,
-      "registry_name": "advancement_accessor",
-      "metadata": {
-        "files": [
-          "src/main/java/net/jaams/jaamsadvancements/mixins/AdvancementAccessorMixin.java"
-        ]
-      },
-      "path": "~/Mixins/Advancement Mixins"
-    },
-    {
-      "name": "JaamsCoreClient",
-      "type": "config",
-      "compiles": true,
-      "locked_code": true,
-      "registry_name": "jaams_core_client",
-      "metadata": {
-        "files": [
-          "src/main/java/net/jaams/jaamscore/configuration/JaamsCoreClientConfiguration.java"
-        ]
-      },
-      "path": "~/Config"
-    },
-    {
-      "name": "JaamsCoreCommon",
-      "type": "config",
-      "compiles": true,
-      "locked_code": true,
-      "registry_name": "jaams_core_common",
-      "metadata": {
-        "files": [
-          "src/main/java/net/jaams/jaamscore/configuration/JaamsCoreCommonConfiguration.java"
-        ]
-      },
-      "path": "~/Config"
-    },
-    {
-      "name": "JaamsCoreModConfigs",
-      "type": "mixin",
-      "compiles": true,
-      "locked_code": true,
-      "registry_name": "jaams_core_mod_configs",
-      "metadata": {
-        "files": [
-          "src/main/java/net/jaams/jaamscore/mixins/JaamsCoreModConfigsMixin.java"
-        ]
-      },
-      "path": "~/Mixins"
-    },
-    {
       "name": "BaseEntity",
       "type": "mixin",
       "compiles": true,
@@ -144,32 +79,6 @@
       "path": "~/Mixins/Mob Mixins"
     },
     {
-      "name": "Slot",
-      "type": "mixin",
-      "compiles": true,
-      "locked_code": true,
-      "registry_name": "slot",
-      "metadata": {
-        "files": [
-          "src/main/java/net/jaams/jaamscore/mixins/SlotMixin.java"
-        ]
-      },
-      "path": "~/Mixins"
-    },
-    {
-      "name": "PlayerRenderer",
-      "type": "mixin",
-      "compiles": true,
-      "locked_code": true,
-      "registry_name": "player_renderer",
-      "metadata": {
-        "files": [
-          "src/main/java/net/jaams/jaamscore/mixins/PlayerRendererMixin.java"
-        ]
-      },
-      "path": "~/Mixins"
-    },
-    {
       "name": "LivingEntityRenderer",
       "type": "mixin",
       "compiles": true,
@@ -209,21 +118,6 @@
       "path": "~/Mixins"
     },
     {
-      "name": "CorePlayer",
-      "type": "livingentity",
-      "compiles": true,
-      "locked_code": true,
-      "registry_name": "core_player",
-      "metadata": {
-        "files": [
-          "src/main/resources/assets/jaams_core/models/item/core_player_spawn_egg.json",
-          "src/main/resources/data/jaams_core/forge/biome_modifier/core_player_biome_modifier.json",
-          "src/main/java/net/jaams/jaamscore/client/renderer/CorePlayerRenderer.java",
-          "src/main/java/net/jaams/jaamscore/entity/CorePlayerEntity.java"
-        ]
-      }
-    },
-    {
       "name": "GeoEntityRenderer",
       "type": "mixin",
       "compiles": true,
@@ -250,19 +144,6 @@
       "path": "~/Mixins"
     },
     {
-      "name": "BackItemKeybind",
-      "type": "keybind",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "back_item_keybind",
-      "metadata": {
-        "files": [
-          "src/main/java/net/jaams/jaamscore/network/BackItemKeybindMessage.java"
-        ]
-      },
-      "path": "~/KeyBinds"
-    },
-    {
       "name": "CoreScale",
       "type": "attribute",
       "compiles": true,
@@ -273,48 +154,121 @@
       }
     },
     {
-      "name": "EntityRenderDispatcher",
+      "name": "ItemRenderer",
       "type": "mixin",
       "compiles": true,
       "locked_code": true,
-      "registry_name": "entity_render_dispatcher",
+      "registry_name": "item_renderer",
       "metadata": {
         "files": [
-          "src/main/java/net/jaams/jaamscore/mixins/EntityRenderDispatcherMixin.java"
+          "src/main/java/net/jaams/jaamscore/mixins/ItemRendererMixin.java"
+        ]
+      }
+    },
+    {
+      "name": "ItemStackConfig",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "item_stack_config",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/ItemStackConfigMixin.java"
+        ]
+      }
+    },
+    {
+      "name": "ItemConfig",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "item_config",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/ItemConfigMixin.java"
+        ]
+      }
+    },
+    {
+      "name": "Interaction",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "interaction",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/InteractionMixin.java"
+        ]
+      }
+    },
+    {
+      "name": "ItemGroup",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "item_group",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/ItemGroupMixin.java"
+        ]
+      }
+    },
+    {
+      "name": "RecipeDisabling",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "recipe_disabling",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/RecipeDisablingMixin.java"
+        ]
+      }
+    },
+    {
+      "name": "VillagerTrade",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "villager_trade",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/VillagerTradeMixin.java"
+        ]
+      }
+    },
+    {
+      "name": "ItemEntity",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "item_entity",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/ItemEntityMixin.java"
+        ]
+      }
+    },
+    {
+      "name": "ItemBanned",
+      "type": "mixin",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "item_banned",
+      "metadata": {
+        "files": [
+          "src/main/java/net/jaams/jaamscore/mixins/ItemBannedMixin.java"
         ]
       }
     }
   ],
-  "variable_elements": [
-    {
-      "name": "UsesTotem",
-      "type": "logic",
-      "scope": "player_lifetime",
-      "value": "false"
-    },
-    {
-      "name": "MainWeapon",
-      "type": "itemstack",
-      "scope": "player_persistent",
-      "value": "ItemStack.EMPTY"
-    }
-  ],
+  "variable_elements": [],
   "sound_elements": [],
   "tag_elements": {},
   "tab_element_order": {},
   "language_map": {
     "en_us": {
-      "message.item_cannot_be_swapped": "The item in hand cannot be swapped",
-      "attribute.jaams_core.core_scale": "Core Scale",
-      "message.item_cannot_be_set": "This item cannot be set as the back item",
-      "message.item_swapped": "Back item has been swapped",
-      "message.items_combined": "Back items merged with the item in hand",
-      "message.item_cannot_be_swapped_but_moved": "Back item cannot be swapped, but it was moved",
-      "item.jaams_core.core_player_spawn_egg": "Core Player Spawn Egg",
-      "message.item_set": "Back item has been set",
-      "entity.jaams_core.core_player": "Core Player",
-      "key.jaams_core.back_item_keybind": "Back Item Keybind",
-      "message.item_moved_to_hand": "Back item has been moved to the hand"
+      "attribute.jaams_core.core_scale": "Core Scale"
     }
   },
   "foldersRoot": {
@@ -332,18 +286,10 @@
             "children": []
           },
           {
-            "name": "Advancement Mixins",
-            "children": []
-          },
-          {
             "name": "Mob Mixins",
             "children": []
           }
         ]
-      },
-      {
-        "name": "KeyBinds",
-        "children": []
       }
     ]
   },
